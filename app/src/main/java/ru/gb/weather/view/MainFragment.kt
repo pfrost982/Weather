@@ -1,4 +1,4 @@
-package ru.gb.weather.ui
+package ru.gb.weather.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import ru.gb.weather.AppState
+import ru.gb.weather.viewmodel.AppState
+import ru.gb.weather.R
 import ru.gb.weather.databinding.MainFragmentBinding
+import ru.gb.weather.model.Weather
+import ru.gb.weather.viewmodel.MainViewModel
 
 class MainFragment : Fragment() {
 
@@ -32,14 +35,14 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
-        viewModel.getWeather()
+        viewModel.getWeatherFromRemoteSource()
     }
 
     private fun renderData(appState: AppState) = when (appState) {
         is AppState.Success -> {
             val weatherData = appState.weatherData
             binding.loadingLayout.visibility = View.GONE
-            Snackbar.make(binding.mainView, "Success", Snackbar.LENGTH_LONG).show()
+            setData(weatherData)
         }
         is AppState.Loading -> {
             binding.loadingLayout.visibility = View.VISIBLE
@@ -48,10 +51,22 @@ class MainFragment : Fragment() {
             binding.loadingLayout.visibility = View.GONE
             Snackbar
                 .make(binding.mainView, "Error", Snackbar.LENGTH_INDEFINITE)
-                .setAction("Reload") { viewModel.getWeather() }
+                .setAction("Reload") { viewModel.getWeatherFromRemoteSource() }
                 .show()
         }
     }
+
+    private fun setData(weatherData: Weather) {
+        binding.cityName.text = weatherData.city.city
+        binding.cityCoordinates.text = String.format(
+            getString(R.string.city_coordinates),
+            weatherData.city.lat.toString(),
+            weatherData.city.lon.toString()
+        )
+        binding.temperatureValue.text = weatherData.temperature.toString()
+        binding.feelsLikeValue.text = weatherData.feelsLike.toString()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

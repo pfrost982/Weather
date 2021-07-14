@@ -1,9 +1,9 @@
-package ru.gb.weather
+package ru.gb.weather.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import ru.gb.weather.R
 import ru.gb.weather.databinding.MainActivityBinding
-import ru.gb.weather.ui.MainFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: MainActivityBinding
