@@ -63,9 +63,11 @@ class MainFragment : Fragment() {
         if (isDataSetRus) {
             viewModel.getWeatherFromLocalSourceWorld()
             binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+            binding.imageView.setImageResource(R.drawable.world)
         } else {
             viewModel.getWeatherFromLocalSourceRus()
             binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
+            binding.imageView.setImageResource(R.drawable.home)
         }
         isDataSetRus = !isDataSetRus
     }
