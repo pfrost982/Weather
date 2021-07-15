@@ -65,6 +65,8 @@ class MainFragment : Fragment() {
         )
         binding.temperatureValue.text = weatherData.temperature.toString()
         binding.feelsLikeValue.text = weatherData.feelsLike.toString()
+        binding.imageView.setImageResource(R.drawable.sun_moon)
+        binding.imageView.imageAlpha = 90
     }
 
 
