@@ -13,12 +13,15 @@ import ru.gb.weather.viewmodel.AppState
 import ru.gb.weather.viewmodel.MainViewModel
 
 class MainFragment : Fragment() {
+    companion object {
+        fun newInstance() = MainFragment()
+    }
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var viewModel: MainViewModel
     private val adapter = MainFragmentAdapter()
+
     private var isDataSetRus: Boolean = true
 
     override fun onCreateView(
@@ -72,8 +75,8 @@ class MainFragment : Fragment() {
         }
     }
 
-    companion object {
-        fun newInstance() =
-            MainFragment()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
