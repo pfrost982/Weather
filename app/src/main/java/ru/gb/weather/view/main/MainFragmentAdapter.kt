@@ -18,31 +18,25 @@ class MainFragmentAdapter(private var onItemViewClickListener: MainFragment.OnIt
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): MainViewHolder {
-        return MainViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder =
+        MainViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.fragment_main_recycler_item, parent, false) as View
         )
-    }
 
-    override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MainViewHolder, position: Int) =
         holder.bind(weatherData[position])
-    }
 
-    override fun getItemCount(): Int {
-        return weatherData.size
-    }
+    override fun getItemCount(): Int = weatherData.size
 
     inner class MainViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(weather: Weather) {
-            itemView.findViewById<TextView>(R.id.mainFragmentRecyclerItemTextView).text =
-                weather.city.city
-            itemView.setOnClickListener { onItemViewClickListener?.onItemViewClick(weather) }
+            itemView.apply {
+                findViewById<TextView>(R.id.mainFragmentRecyclerItemTextView).text =
+                    weather.city.city
+                setOnClickListener { onItemViewClickListener?.onItemViewClick(weather) }
+            }
         }
-
     }
 
     fun removeListener() {
