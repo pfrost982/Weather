@@ -19,26 +19,24 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
-    interface OnItemViewClickListener {
+    fun interface OnItemViewClickListener {
         fun onItemViewClick(weather: Weather)
     }
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: MainViewModel
-    private val adapter = MainFragmentAdapter(object : OnItemViewClickListener {
-        override fun onItemViewClick(weather: Weather) {
-            val manager = activity?.supportFragmentManager
-            if (manager != null) {
-                val bundle = Bundle()
-                bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
-                manager.beginTransaction()
-                    .add(R.id.container, DetailsFragment.newInstance(bundle))
-                    .addToBackStack("")
-                    .commitAllowingStateLoss()
-            }
+    private val adapter = MainFragmentAdapter {
+        val manager = activity?.supportFragmentManager
+        if (manager != null) {
+            val bundle = Bundle()
+            bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, it)
+            manager.beginTransaction()
+                .add(R.id.container, DetailsFragment.newInstance(bundle))
+                .addToBackStack("")
+                .commitAllowingStateLoss()
         }
-    })
+    }
 
     private var isDataSetRus: Boolean = true
 
@@ -64,10 +62,12 @@ class MainFragment : Fragment() {
             viewModel.getWeatherFromLocalSourceWorld()
             binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
             binding.imageView.setImageResource(R.drawable.world)
+            binding.imageView.alpha = 0.4F
         } else {
             viewModel.getWeatherFromLocalSourceRus()
             binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
             binding.imageView.setImageResource(R.drawable.home)
+            binding.imageView.alpha = 0.85F
         }
         isDataSetRus = !isDataSetRus
     }
