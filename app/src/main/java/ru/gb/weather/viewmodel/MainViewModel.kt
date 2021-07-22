@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import ru.gb.weather.model.City
 import ru.gb.weather.model.Repository
 import ru.gb.weather.model.RepositoryImpl
-import ru.gb.weather.model.Weather
 import java.lang.Thread.sleep
 
 class MainViewModel(
@@ -23,8 +22,13 @@ class MainViewModel(
     fun getWeatherFromRemoteSource(city: City) {
         liveDataToObserve.value = AppState.Loading
         Thread {
-            sleep(3000)
-            liveDataToObserve.postValue(AppState.SuccessWeather(repositoryImpl.getWeatherFromServer(city)))
+            liveDataToObserve.postValue(
+                AppState.SuccessWeather(
+                    repositoryImpl.getWeatherFromServer(
+                        city
+                    )
+                )
+            )
         }.start()
     }
 
