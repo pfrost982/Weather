@@ -11,6 +11,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Weather">
+        <service
+            android:name=".viewmodel.MainService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
