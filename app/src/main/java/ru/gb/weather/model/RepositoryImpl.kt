@@ -1,18 +1,16 @@
 package ru.gb.weather.model
 
 import org.json.JSONObject
+import ru.gb.weather.BuildConfig
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
-
-private const val APP_KEY = "b58b07d6cf65ae743e1353ded4f0d260"
-
 class RepositoryImpl : Repository {
     override fun getWeatherFromServer(city: City): Weather {
         val uri =
-            "https://api.openweathermap.org/data//2.5/weather?q=${city.city}&units=metric&lang=ru&APPID=$APP_KEY"
+            "https://api.openweathermap.org/data//2.5/weather?q=${city.city}&units=metric&lang=ru&APPID=${BuildConfig.WEATHER_API_KEY}"
         val connection =
             URL(uri).openConnection() as HttpsURLConnection
         connection.requestMethod = "GET"
@@ -27,8 +25,17 @@ class RepositoryImpl : Repository {
         val jsonWeather = jsonResponse.getJSONArray("weather").getJSONObject(0)
         val jsonCoordinates = jsonResponse.getJSONObject("coord")
         val jsonMain = jsonResponse.getJSONObject("main")
-        val city = City(jsonResponse.getString("name"), jsonCoordinates.getDouble("lat"), jsonCoordinates.getDouble("lon"))
-        return Weather(city, jsonMain.getDouble("temp"), jsonMain.getDouble("feels_like"), jsonWeather.getString("description"))
+        val city = City(
+            jsonResponse.getString("name"),
+            jsonCoordinates.getDouble("lat"),
+            jsonCoordinates.getDouble("lon")
+        )
+        return Weather(
+            city,
+            jsonMain.getDouble("temp"),
+            jsonMain.getDouble("feels_like"),
+            jsonWeather.getString("description")
+        )
     }
 
     override fun getWeatherFromLocalStorageRus() = getRussianCities()
