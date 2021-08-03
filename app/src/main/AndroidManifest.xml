@@ -12,9 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Weather">
         <service
-            android:name=".viewmodel.MainService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:name=".model.DetailsService"
+            android:exported="false" />
 
         <activity android:name=".view.MainActivity">
             <intent-filter>

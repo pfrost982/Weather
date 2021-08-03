@@ -10,13 +10,14 @@ import javax.net.ssl.HttpsURLConnection
 class RepositoryImpl : Repository {
     override fun getWeatherFromServer(city: City): Weather {
         val uri =
-            "https://api.openweathermap.org/data//2.5/weather?q=${city.city}&units=metric&lang=ru&APPID=${BuildConfig.WEATHER_API_KEY}"
+            "https://api.openweathermap.org/data//2.5/weather?q=${city.cityName}&units=metric&lang=ru&APPID=${BuildConfig.WEATHER_API_KEY}"
         val connection =
             URL(uri).openConnection() as HttpsURLConnection
         connection.requestMethod = "GET"
         connection.readTimeout = 10_000
         val reader = BufferedReader(InputStreamReader(connection.inputStream))
         val response = reader.readLines().joinToString()
+        connection.disconnect()
         return parse(response)
     }
 
