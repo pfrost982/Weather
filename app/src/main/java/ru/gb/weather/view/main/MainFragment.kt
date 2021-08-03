@@ -33,6 +33,7 @@ class MainFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
     private val adapter = MainFragmentAdapter { weather ->
+        binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
         context?.let { context ->
             context.startService(Intent(context, DetailsService::class.java).apply {
                 putExtra("EXTRA_CITY_FOR_SERVICE", weather.city)
