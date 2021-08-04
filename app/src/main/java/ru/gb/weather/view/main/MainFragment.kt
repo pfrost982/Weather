@@ -39,6 +39,7 @@ class MainFragment : Fragment() {
                 putExtra("EXTRA_CITY_FOR_SERVICE", weather.city)
             })
         }
+
         //viewModel.getWeatherFromRemoteSource(weather.city)
     }
 
