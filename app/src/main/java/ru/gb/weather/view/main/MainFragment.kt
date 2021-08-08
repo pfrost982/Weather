@@ -1,20 +1,14 @@
 package ru.gb.weather.view.main
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
 import ru.gb.weather.R
 import ru.gb.weather.databinding.FragmentMainBinding
-import ru.gb.weather.model.DetailsService
 import ru.gb.weather.model.Weather
 import ru.gb.weather.view.details.DetailsFragment
 import ru.gb.weather.viewmodel.AppState
@@ -32,31 +26,7 @@ class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
-    private val adapter = MainFragmentAdapter { weather ->
-        binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
-        context?.let { context ->
-            context.startService(Intent(context, DetailsService::class.java).apply {
-                putExtra("EXTRA_CITY_FOR_SERVICE", weather.city)
-            })
-        }
-
-        //viewModel.getWeatherFromRemoteSource(weather.city)
-    }
-
-    private val loadResultsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val weather = intent.getParcelableExtra<Weather>("EXTRA_WEATHER_FOR_BROADCAST_RECEIVER")
-            weather?.let { openDetailsFragment(it) }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        context?.let {
-            LocalBroadcastManager.getInstance(it)
-                .registerReceiver(loadResultsReceiver, IntentFilter("DETAILS_INTENT_FILTER"))
-        }
-    }
+    private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it.city) }
 
     private var isDataSetRus: Boolean = true
 
@@ -140,9 +110,6 @@ class MainFragment : Fragment() {
     override fun onDestroyView() {
         _binding = null
         adapter.removeListener()
-        context?.let {
-            LocalBroadcastManager.getInstance(it).unregisterReceiver(loadResultsReceiver)
-        }
         super.onDestroyView()
     }
 }
