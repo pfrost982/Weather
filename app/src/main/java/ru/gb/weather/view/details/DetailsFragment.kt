@@ -43,7 +43,7 @@ class DetailsFragment : Fragment() {
                 binding.feelsLikeValue.text = weather.feelsLike.toString()
                 binding.description.text = weather.description
                 Glide.with(this)
-                    .load("http://openweathermap.org/img/wn/${weather.icon}@4x.png")
+                    .load("https://openweathermap.org/img/wn/${weather.icon}@4x.png")
                     .centerCrop()
                     .into(binding.imageView)
             }
