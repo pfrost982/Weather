@@ -79,9 +79,14 @@ class MainFragment : Fragment() {
             is AppState.Error -> {
                 binding.mainFragmentLoadingLayout.visibility = View.GONE
                 binding.mainFragmentRootView.showSnackBar(
-                    getString(R.string.error),
-                    getString(R.string.reload),
-                    { viewModel.getWeatherFromLocalSourceRus() })
+                    appState.error.toString(),
+                    getString(R.string.reload), {
+                        viewModel.getWeatherFromLocalSourceRus()
+                        binding.mainFragmentFAB.setImageResource(R.drawable.world_b)
+                        binding.imageView.setImageResource(R.drawable.home)
+                        binding.imageView.alpha = 0.85F
+                        isDataSetRus = true
+                    })
             }
         }
 
