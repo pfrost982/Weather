@@ -42,7 +42,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.mainFragmentRecyclerView.adapter = adapter
-        binding.mainFragmentFAB.setOnClickListener { changeWeatherDataSet() }
+        binding.mainFragmentFab.setOnClickListener { changeWeatherDataSet() }
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
         setRusData()
     }
@@ -57,14 +57,14 @@ class MainFragment : Fragment() {
 
     private fun setWorldData() {
         viewModel.getWeatherFromLocalSourceWorld()
-        binding.mainFragmentFAB.setImageResource(R.drawable.russia_b)
+        binding.mainFragmentFab.setImageResource(R.drawable.russia_b)
         binding.imageView.setImageResource(R.drawable.world)
         binding.imageView.alpha = 0.4F
     }
 
     private fun setRusData() {
         viewModel.getWeatherFromLocalSourceRus()
-        binding.mainFragmentFAB.setImageResource(R.drawable.world_b)
+        binding.mainFragmentFab.setImageResource(R.drawable.world_b)
         binding.imageView.setImageResource(R.drawable.home)
         binding.imageView.alpha = 0.85F
     }
