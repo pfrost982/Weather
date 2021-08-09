@@ -44,24 +44,29 @@ class MainFragment : Fragment() {
         binding.mainFragmentRecyclerView.adapter = adapter
         binding.mainFragmentFAB.setOnClickListener { changeWeatherDataSet() }
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
-        viewModel.getWeatherFromLocalSourceRus()
+        setRusData()
     }
 
-    private fun changeWeatherDataSet() = when {
-        isDataSetRus -> {
-            viewModel.getWeatherFromLocalSourceWorld()
-            binding.mainFragmentFAB.setImageResource(R.drawable.russia_b)
-            binding.imageView.setImageResource(R.drawable.world)
-            binding.imageView.alpha = 0.4F
-        }
-        else -> {
-            viewModel.getWeatherFromLocalSourceRus()
-            binding.mainFragmentFAB.setImageResource(R.drawable.world_b)
-            binding.imageView.setImageResource(R.drawable.home)
-            binding.imageView.alpha = 0.85F
-        }
-    }.also {
+    private fun changeWeatherDataSet() {
         isDataSetRus = !isDataSetRus
+        when {
+            isDataSetRus -> setRusData()
+            else -> setWorldData()
+        }
+    }
+
+    private fun setWorldData() {
+        viewModel.getWeatherFromLocalSourceWorld()
+        binding.mainFragmentFAB.setImageResource(R.drawable.russia_b)
+        binding.imageView.setImageResource(R.drawable.world)
+        binding.imageView.alpha = 0.4F
+    }
+
+    private fun setRusData() {
+        viewModel.getWeatherFromLocalSourceRus()
+        binding.mainFragmentFAB.setImageResource(R.drawable.world_b)
+        binding.imageView.setImageResource(R.drawable.home)
+        binding.imageView.alpha = 0.85F
     }
 
     private fun renderData(appState: AppState) =
@@ -81,11 +86,10 @@ class MainFragment : Fragment() {
                 binding.mainFragmentRootView.showSnackBar(
                     appState.error.toString(),
                     getString(R.string.reload), {
-                        viewModel.getWeatherFromLocalSourceRus()
-                        binding.mainFragmentFAB.setImageResource(R.drawable.world_b)
-                        binding.imageView.setImageResource(R.drawable.home)
-                        binding.imageView.alpha = 0.85F
-                        isDataSetRus = true
+                        when {
+                            isDataSetRus -> setRusData()
+                            else -> setWorldData()
+                        }
                     })
             }
         }

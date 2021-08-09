@@ -15,6 +15,7 @@ class MainViewModel(
     fun getLiveData() = liveDataToObserve
     fun getWeatherFromLocalSourceRus() = getDataFromLocalSource(isRussian = true)
     fun getWeatherFromLocalSourceWorld() = getDataFromLocalSource(isRussian = false)
+
     fun getWeatherFromRemoteSource(city: City) {
         liveDataToObserve.value = AppState.Loading
         repositoryImpl.getWeatherFromServer(city,
@@ -33,7 +34,7 @@ class MainViewModel(
                             )
                         }
                     } else {
-                        liveDataToObserve.postValue(AppState.Error(Throwable("Response in not Successful")))
+                        liveDataToObserve.postValue(AppState.Error(Throwable("Response is not Successful")))
                     }
                 }
 
@@ -53,7 +54,8 @@ class MainViewModel(
             ),
             openWeatherWebEntity.main.temp,
             openWeatherWebEntity.main.feels_like,
-            openWeatherWebEntity.weather[0].description
+            openWeatherWebEntity.weather[0].description,
+            openWeatherWebEntity.weather[0].icon
         )
     }
 

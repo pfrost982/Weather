@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import ru.gb.weather.R
 import ru.gb.weather.databinding.FragmentDetailsBinding
 import ru.gb.weather.model.Weather
@@ -41,6 +42,10 @@ class DetailsFragment : Fragment() {
                 binding.temperatureValue.text = weather.temperature.toString()
                 binding.feelsLikeValue.text = weather.feelsLike.toString()
                 binding.description.text = weather.description
+                Glide.with(this)
+                    .load("http://openweathermap.org/img/wn/${weather.icon}@4x.png")
+                    .centerCrop()
+                    .into(binding.imageView)
             }
         }
     }

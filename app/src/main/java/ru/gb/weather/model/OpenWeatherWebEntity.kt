@@ -8,7 +8,7 @@ data class OpenWeatherWebEntity(
     val visibility: Int,
     val wind: Wind,
     val clouds: Clouds,
-    val dt: Int,
+    val dt: Long,
     val sys: Sys,
     val timezone: Int,
     val id: Int,
