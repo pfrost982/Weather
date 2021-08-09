@@ -1,5 +1,7 @@
 package ru.gb.weather.model
 
+import com.google.gson.annotations.SerializedName
+
 data class OpenWeatherWebEntity(
     val coord: Coord,
     val weather: List<Weather>,
@@ -26,9 +28,12 @@ data class OpenWeatherWebEntity(
 
     data class Main (
         val temp: Double,
-        val feels_like: Double,
-        val temp_min: Double,
-        val temp_max: Double,
+        @SerializedName("feels_like")
+        val feelsLike: Double,
+        @SerializedName("temp_min")
+        val tempMin: Double,
+        @SerializedName("temp_max")
+        val tempMax: Double,
         val pressure: Int,
         val humidity: Int
     )

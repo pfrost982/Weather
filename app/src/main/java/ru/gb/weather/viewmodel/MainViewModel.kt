@@ -53,7 +53,7 @@ class MainViewModel(
                 openWeatherWebEntity.coord.lon
             ),
             openWeatherWebEntity.main.temp,
-            openWeatherWebEntity.main.feels_like,
+            openWeatherWebEntity.main.feelsLike,
             openWeatherWebEntity.weather[0].description,
             openWeatherWebEntity.weather[0].icon
         )
