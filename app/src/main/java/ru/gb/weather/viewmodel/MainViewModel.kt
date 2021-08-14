@@ -9,7 +9,7 @@ import ru.gb.weather.model.*
 import java.lang.Thread.sleep
 
 class MainViewModel(
-    private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData(),
+    private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
 ) : ViewModel() {
     private val repositoryImpl: Repository = RepositoryImpl
     fun getLiveData() = liveDataToObserve

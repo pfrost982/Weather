@@ -1,5 +1,8 @@
 package ru.gb.weather.model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class OpenWeatherWebEntity(
@@ -16,17 +19,17 @@ data class OpenWeatherWebEntity(
     val id: Int,
     val name: String,
     val cod: Int
-){
-    data class Clouds (
+) {
+    data class Clouds(
         val all: Int
     )
 
-    data class Coord (
+    data class Coord(
         val lon: Double,
         val lat: Double
     )
 
-    data class Main (
+    data class Main(
         val temp: Double,
         @SerializedName("feels_like")
         val feelsLike: Double,
@@ -38,7 +41,7 @@ data class OpenWeatherWebEntity(
         val humidity: Int
     )
 
-    data class Sys (
+    data class Sys(
         val type: Int,
         val id: Int,
         val country: String,
@@ -46,14 +49,14 @@ data class OpenWeatherWebEntity(
         val sunset: Long
     )
 
-    data class Weather (
+    data class Weather(
         val id: Int,
         val main: String,
         val description: String,
         val icon: String
     )
 
-    data class Wind (
+    data class Wind(
         val speed: Double,
         val deg: Int
     )

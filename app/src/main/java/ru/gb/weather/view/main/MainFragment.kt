@@ -65,7 +65,7 @@ class MainFragment : Fragment() {
     private fun setRusData() {
         viewModel.getWeatherFromLocalSourceRus()
         binding.mainFragmentFab.setImageResource(R.drawable.world_b)
-        binding.imageView.setImageResource(R.drawable.home)
+        binding.imageView.setImageResource(R.drawable.clouds)
         binding.imageView.alpha = 0.85F
     }
 
