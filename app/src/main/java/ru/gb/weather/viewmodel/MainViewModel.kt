@@ -6,17 +6,42 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.gb.weather.model.*
+import ru.gb.weather.model.web.OpenWeatherWebEntity
 import java.lang.Thread.sleep
 
-class MainViewModel(
+class MainViewModel : ViewModel() {
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
-) : ViewModel() {
-    private val repositoryImpl: Repository = RepositoryImpl
+    private val repositoryImpl: Repository = RepositoryImpl()
     fun getLiveData() = liveDataToObserve
-    fun getWeatherFromLocalSourceRus() = getDataFromLocalSource(isRussian = true)
-    fun getWeatherFromLocalSourceWorld() = getDataFromLocalSource(isRussian = false)
+    private val weatherList = getCities()
 
-    fun getWeatherFromRemoteSource(city: City) {
+    fun addCity(weather: Weather) {
+        var contain = false
+        weatherList.forEach {
+            if (weather.city.cityName == it.city.cityName) {
+                contain = true
+            }
+        }
+        if (!contain) {
+            weatherList.add(weather)
+            liveDataToObserve.value = AppState.SuccessList(weatherList)
+        }
+    }
+
+    fun getDataFromLocalSource() {
+        liveDataToObserve.value = AppState.Loading
+        Thread {
+            sleep(1000)
+            liveDataToObserve.postValue(
+                AppState.SuccessList(
+                    //repositoryImpl.getCitiesListFromLocalStorage()
+                    weatherList
+                )
+            )
+        }.start()
+    }
+
+    fun getWeatherFromRemoteSource(city: City, newCity: Boolean = false) {
         liveDataToObserve.value = AppState.Loading
         repositoryImpl.getWeatherFromServer(city,
             object : Callback<OpenWeatherWebEntity> {
@@ -29,7 +54,7 @@ class MainViewModel(
                         if (openWeatherWebEntity != null) {
                             liveDataToObserve.postValue(
                                 AppState.SuccessWeather(
-                                    weatherParse(openWeatherWebEntity)
+                                    weatherParse(openWeatherWebEntity), newCity
                                 )
                             )
                         }
@@ -57,19 +82,6 @@ class MainViewModel(
             openWeatherWebEntity.weather[0].description,
             openWeatherWebEntity.weather[0].icon
         )
-    }
-
-    private fun getDataFromLocalSource(isRussian: Boolean) {
-        liveDataToObserve.value = AppState.Loading
-        Thread {
-            sleep(1000)
-            liveDataToObserve.postValue(
-                AppState.SuccessList(
-                    if (isRussian) repositoryImpl.getWeatherFromLocalStorageRus()
-                    else repositoryImpl.getWeatherFromLocalStorageWorld()
-                )
-            )
-        }.start()
     }
 }
 

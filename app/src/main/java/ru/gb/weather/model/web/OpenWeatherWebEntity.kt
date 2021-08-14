@@ -1,8 +1,5 @@
-package ru.gb.weather.model
+package ru.gb.weather.model.web
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class OpenWeatherWebEntity(

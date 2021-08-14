@@ -9,13 +9,19 @@ import com.bumptech.glide.Glide
 import ru.gb.weather.R
 import ru.gb.weather.databinding.FragmentDetailsBinding
 import ru.gb.weather.model.Weather
+import ru.gb.weather.viewmodel.MainViewModel
 
 class DetailsFragment : Fragment() {
-    companion object {
-        const val BUNDLE_EXTRA = "weather"
 
-        fun newInstance(bundle: Bundle): DetailsFragment = DetailsFragment().apply {
-            this.arguments = bundle
+    companion object {
+        const val EXTRA_WEATHER = "EXTRA_WEATHER"
+        const val EXTRA_NEW_CITY = "EXTRA_CITY"
+        private var viewModelS: MainViewModel? = null
+        fun newInstance(viewModel: MainViewModel, bundle: Bundle): DetailsFragment {
+            viewModelS = viewModel
+            return DetailsFragment().apply {
+                this.arguments = bundle
+            }
         }
     }
 
@@ -31,7 +37,11 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.getParcelable<Weather>(BUNDLE_EXTRA)?.let { weather ->
+        val newCity = arguments?.getBoolean(EXTRA_NEW_CITY)
+        arguments?.getParcelable<Weather>(EXTRA_WEATHER)?.let { weather ->
+            if (newCity == true){
+                viewModelS?.addCity(weather)
+            }
             weather.city.also { city ->
                 binding.cityName.text = city.cityName
                 binding.cityCoordinates.text = String.format(
