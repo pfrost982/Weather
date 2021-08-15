@@ -57,7 +57,7 @@ class MainFragment : Fragment() {
             ?.setCancelable(false)
             ?.setPositiveButton("OK") { _, _ ->
                 viewModel.getWeatherFromRemoteSource(
-                    City(inputCity.text.toString(), 0.0, 0.0),
+                    City(0, inputCity.text.toString(), 0.0, 0.0),
                     true
                 )
             }
