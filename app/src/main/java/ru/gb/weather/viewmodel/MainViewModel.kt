@@ -24,8 +24,19 @@ class MainViewModel : ViewModel() {
         }
         if (!contain) {
             weatherList.add(weather)
-            liveDataToObserve.value = AppState.SuccessList(weatherList)
+            getDataFromLocalSource()
         }
+    }
+
+    fun deleteCity(weather: Weather) {
+        var weatherForDelete: Weather? = null
+        weatherList.forEach {
+            if (weather.city.cityName == it.city.cityName) {
+                weatherForDelete = it
+            }
+        }
+        weatherList.remove(weatherForDelete)
+        getDataFromLocalSource()
     }
 
     fun getDataFromLocalSource() {
