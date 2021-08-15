@@ -11,7 +11,6 @@ import ru.gb.weather.model.RepositoryImpl
 import ru.gb.weather.model.Weather
 import ru.gb.weather.model.web.OpenWeatherWebEntity
 
-
 class MainViewModel : ViewModel() {
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
     private val repositoryImpl: Repository = RepositoryImpl()
