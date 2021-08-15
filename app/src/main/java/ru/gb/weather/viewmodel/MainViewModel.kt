@@ -13,40 +13,40 @@ class MainViewModel : ViewModel() {
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
     private val repositoryImpl: Repository = RepositoryImpl()
     fun getLiveData() = liveDataToObserve
-    private val weatherList = getCities()
+    private val citiesList = repositoryImpl.getCitiesListFromLocalStorage().toMutableList()
 
-    fun addCity(weather: Weather) {
+    fun addCity(city: City) {
         var contain = false
-        weatherList.forEach {
-            if (weather.city.cityName == it.city.cityName) {
+        citiesList.forEach {
+            if (city.cityName == it.cityName) {
                 contain = true
             }
         }
         if (!contain) {
-            weatherList.add(weather)
-            getDataFromLocalSource()
+            citiesList.add(city)
+            getCitiesListFromLocalSource()
         }
     }
 
-    fun deleteCity(weather: Weather) {
-        var weatherForDelete: Weather? = null
-        weatherList.forEach {
-            if (weather.city.cityName == it.city.cityName) {
+    fun deleteCity(city: City) {
+        var weatherForDelete: City? = null
+        citiesList.forEach {
+            if (city.cityName == it.cityName) {
                 weatherForDelete = it
             }
         }
-        weatherList.remove(weatherForDelete)
-        getDataFromLocalSource()
+        citiesList.remove(weatherForDelete)
+        getCitiesListFromLocalSource()
     }
 
-    fun getDataFromLocalSource() {
+    fun getCitiesListFromLocalSource() {
         liveDataToObserve.value = AppState.Loading
         Thread {
             sleep(1000)
             liveDataToObserve.postValue(
                 AppState.SuccessList(
                     //repositoryImpl.getCitiesListFromLocalStorage()
-                    weatherList
+                    citiesList
                 )
             )
         }.start()

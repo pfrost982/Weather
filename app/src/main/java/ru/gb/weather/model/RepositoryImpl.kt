@@ -17,5 +17,9 @@ class RepositoryImpl : Repository {
         service.getCurrentWeather(city.cityName).enqueue(callback)
     }
 
-    override fun getCitiesListFromLocalStorage() = getCities()
+    override fun getCitiesListFromLocalStorage() = listOf(
+        City("Барнаул", 55.755826, 37.617299900000035),
+        City("Москва", 55.755826, 37.617299900000035),
+        City("Санкт-Петербург", 59.9342802, 30.335098600000038),
+    )
 }

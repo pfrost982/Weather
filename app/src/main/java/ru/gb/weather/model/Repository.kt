@@ -5,5 +5,5 @@ import ru.gb.weather.model.web.OpenWeatherWebEntity
 
 interface Repository {
     fun getWeatherFromServer(city: City, callback: Callback<OpenWeatherWebEntity>)
-    fun getCitiesListFromLocalStorage(): List<Weather>
+    fun getCitiesListFromLocalStorage(): List<City>
 }

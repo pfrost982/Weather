@@ -57,14 +57,14 @@ class DetailsFragment(private val viewModel: MainViewModel) : Fragment() {
                 .into(binding.imageView)
 
             binding.detailsFragmentFab.setOnClickListener {
-                if (newCity == false) {
-                    viewModel.deleteCity(weather)
+                newCity = if (newCity == false) {
+                    viewModel.deleteCity(weather.city)
                     binding.detailsFragmentFab.setImageResource(R.drawable.ic_baseline_add_24)
-                    newCity = true
+                    true
                 } else {
-                    viewModel.addCity(weather)
+                    viewModel.addCity(weather.city)
                     binding.detailsFragmentFab.setImageResource(R.drawable.ic_baseline_location_off_24)
-                    newCity = false
+                    false
                 }
             }
         }

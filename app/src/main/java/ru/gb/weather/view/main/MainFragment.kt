@@ -23,13 +23,13 @@ class MainFragment : Fragment() {
     }
 
     fun interface OnItemViewClickListener {
-        fun onItemViewClick(weather: Weather)
+        fun onItemViewClick(city: City)
     }
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
-    private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it.city) }
+    private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,7 +45,7 @@ class MainFragment : Fragment() {
         binding.mainFragmentRecyclerView.adapter = adapter
         binding.mainFragmentFab.setOnClickListener { showDialogView() }
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
-        viewModel.getDataFromLocalSource()
+        viewModel.getCitiesListFromLocalSource()
     }
 
     private fun showDialogView() {
@@ -70,7 +70,7 @@ class MainFragment : Fragment() {
         when (appState) {
             is AppState.SuccessList -> {
                 binding.mainFragmentLoadingLayout.visibility = View.GONE
-                adapter.setWeather(appState.weatherDataList)
+                adapter.setWeather(appState.citiesDataList)
             }
             is AppState.SuccessWeather -> {
                 openDetailsFragment(appState.weatherData, appState.newCity)
@@ -83,7 +83,7 @@ class MainFragment : Fragment() {
                 binding.mainFragmentRootView.showSnackBar(
                     appState.error.toString(),
                     getString(R.string.reload), {
-                        viewModel.getDataFromLocalSource()
+                        viewModel.getCitiesListFromLocalSource()
                     })
             }
         }
