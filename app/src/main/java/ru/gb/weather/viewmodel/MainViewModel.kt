@@ -5,53 +5,33 @@ import androidx.lifecycle.ViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import ru.gb.weather.App
 import ru.gb.weather.model.City
 import ru.gb.weather.model.Repository
 import ru.gb.weather.model.RepositoryImpl
 import ru.gb.weather.model.Weather
 import ru.gb.weather.model.web.OpenWeatherWebEntity
-import java.lang.Thread.sleep
 
 class MainViewModel : ViewModel() {
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData()
     private val repositoryImpl: Repository = RepositoryImpl()
     fun getLiveData() = liveDataToObserve
-    private val citiesList = emptyList<City>().toMutableList()
 
     fun addCity(city: City) {
-        var contain = false
-        citiesList.forEach {
-            if (city.cityName == it.cityName) {
-                contain = true
-            }
-        }
-        if (!contain) {
-            citiesList.add(city)
-            getCitiesListFromLocalSource()
-        }
+        repositoryImpl.addCityToLocalStorage(city)
+        getCitiesListFromLocalSource()
     }
 
     fun deleteCity(city: City) {
-        var weatherForDelete: City? = null
-        citiesList.forEach {
-            if (city.cityName == it.cityName) {
-                weatherForDelete = it
-            }
-        }
-        citiesList.remove(weatherForDelete)
+        repositoryImpl.deleteCityFromLocalStorage(city)
         getCitiesListFromLocalSource()
     }
 
     fun getCitiesListFromLocalSource() {
         liveDataToObserve.value = AppState.Loading
         Thread {
-            sleep(1000)
             liveDataToObserve.postValue(
                 AppState.SuccessList(
-
-                    //repositoryImpl.getCitiesListFromLocalStorage()
-                    citiesList
+                    repositoryImpl.getCitiesListFromLocalStorage()
                 )
             )
         }.start()

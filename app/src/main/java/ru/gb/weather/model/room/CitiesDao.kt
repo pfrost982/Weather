@@ -5,18 +5,18 @@ import ru.gb.weather.model.City
 
 @Dao
 interface CitiesDao {
-    @Query("SELECT * FROM CityEntity")
-    fun getAll(): List<CityEntity>
+    @Query("SELECT * FROM City")
+    fun getAll(): List<City>
 
-    @Query("SELECT * FROM CityEntity WHERE city_name LIKE :city")
-    fun getCityByName(city: String): List<CityEntity>
+    @Query("SELECT * FROM City WHERE city_name LIKE :city")
+    fun getCityByName(city: String): List<City>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertCity(entity: CityEntity)
+    fun insertCity(entity: City)
 
     @Update
-    fun updateCity(entity: CityEntity)
+    fun updateCity(entity: City)
 
     @Delete
-    fun deleteCity(entity: CityEntity)
+    fun deleteCity(entity: City)
 }
