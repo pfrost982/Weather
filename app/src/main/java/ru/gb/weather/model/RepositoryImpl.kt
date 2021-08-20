@@ -24,10 +24,11 @@ class RepositoryImpl : Repository {
         citiesDao.getAll()
 
     override fun addCityToLocalStorage(city: City) {
+        citiesDao.deleteCityByName(city.cityName)
         citiesDao.insertCity(city)
     }
 
     override fun deleteCityFromLocalStorage(city: City) {
-        citiesDao.deleteCity(city)
+        citiesDao.deleteCityByName(city.cityName)
     }
 }

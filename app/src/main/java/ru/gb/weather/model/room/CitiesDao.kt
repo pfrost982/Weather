@@ -11,6 +11,9 @@ interface CitiesDao {
     @Query("SELECT * FROM City WHERE city_name LIKE :city")
     fun getCityByName(city: String): List<City>
 
+    @Query("DELETE FROM City WHERE city_name LIKE :city")
+    fun deleteCityByName(city: String)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertCity(entity: City)
 
