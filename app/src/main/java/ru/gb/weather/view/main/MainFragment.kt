@@ -1,11 +1,17 @@
 package ru.gb.weather.view.main
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context.LOCATION_SERVICE
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
@@ -16,6 +22,8 @@ import ru.gb.weather.model.Weather
 import ru.gb.weather.view.details.DetailsFragment
 import ru.gb.weather.viewmodel.AppState
 import ru.gb.weather.viewmodel.MainViewModel
+
+const val REQUEST_CODE = 404
 
 class MainFragment : Fragment() {
     companion object {
@@ -43,12 +51,84 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.mainFragmentRecyclerView.adapter = adapter
-        binding.mainFragmentFab.setOnClickListener { showDialogView() }
+        binding.mainFragmentFab.setOnClickListener { getNewCity() }
+        binding.mainLocationFab.setOnClickListener { getLocation() }
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
         viewModel.getCitiesListFromLocalSource()
     }
 
-    private fun showDialogView() {
+    private fun getLocation() {
+        context?.let { context ->
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) -> {
+                    showCoordinates()
+                }
+                else -> {
+                    requestPermission()
+                }
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun showCoordinates() {
+        val locationManager = context?.getSystemService(LOCATION_SERVICE) as LocationManager
+        var first = true
+        // сделал как на уроке а эта ерунда циклически вызывается, пришлось извращаться
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f) { location ->
+            if (first) showCoordinatesAlert(location.latitude, location.longitude)
+            first = false
+        }
+    }
+
+    private fun showCoordinatesAlert(lat: Double, lon: Double) {
+        context?.let { context ->
+            AlertDialog.Builder(context)
+                .setTitle("Координаты: ")
+                .setMessage("Широта: ${lat}\nДолгота: ${lon}")
+                .setNegativeButton("Закрыть") { dialog, _ -> dialog.dismiss() }
+                .create()
+                .show()
+        }
+    }
+
+    private fun requestPermission() {
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
+        when (requestCode) {
+            REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() &&
+                            grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                ) {
+                    showCoordinates()
+                } else {
+                    context?.let {
+                        AlertDialog.Builder(it)
+                            .setTitle("Доступ к геолокации")
+                            .setMessage("Вы не позволили приложению получить доступ к геолокации, но без этого разрешения приложение не сможет получить координаты")
+                            .setNegativeButton("Закрыть") { dialog, _ -> dialog.dismiss() }
+                            .create()
+                            .show()
+                    }
+                }
+                return
+            }
+        }
+    }
+
+
+    private fun getNewCity() {
         val dialogView: View = layoutInflater.inflate(R.layout.dialog_new_city, null)
         val dialogBuilder = context?.let { AlertDialog.Builder(it) }
         dialogBuilder?.setView(dialogView)
