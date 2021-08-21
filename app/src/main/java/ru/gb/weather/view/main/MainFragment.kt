@@ -2,9 +2,12 @@ package ru.gb.weather.view.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context.LOCATION_SERVICE
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -89,6 +92,13 @@ class MainFragment : Fragment() {
             AlertDialog.Builder(context)
                 .setTitle("Координаты: ")
                 .setMessage("Широта: ${lat}\nДолгота: ${lon}")
+                .setPositiveButton("Передать в контент провайдер") { dialog, _ ->
+                    val contentResolver: ContentResolver = context.contentResolver
+                    val contentValues = ContentValues()
+                    contentValues.put("lat", lat)
+                    contentValues.put("lon", lon)
+                    contentResolver.insert(Uri.parse("content://ru.gb.weather.coordinates"), contentValues)
+                }
                 .setNegativeButton("Закрыть") { dialog, _ -> dialog.dismiss() }
                 .create()
                 .show()
