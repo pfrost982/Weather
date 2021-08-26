@@ -1,5 +1,6 @@
 package ru.gb.weather.view.map
 
+import android.annotation.SuppressLint
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
@@ -17,10 +18,13 @@ import ru.gb.weather.databinding.FragmentMapsBinding
 
 class MapsFragment(lat: Double, lon: Double) : Fragment() {
 
+    @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
         val location = LatLng(lat, lon)
         googleMap.addMarker(MarkerOptions().position(location).title("Location"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 10f))
+        googleMap.isBuildingsEnabled = true
+        googleMap.isMyLocationEnabled = true
     }
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!

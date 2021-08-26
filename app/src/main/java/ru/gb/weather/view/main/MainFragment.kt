@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context.LOCATION_SERVICE
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -159,9 +160,18 @@ class MainFragment : Fragment() {
             ?.setCancelable(false)
             ?.setPositiveButton("OK") { _, _ ->
                 viewModel.getWeatherFromRemoteSource(
-                    City(0, inputCity.text.toString(), 0.0, 0.0),
-                    true
+                    City(0, inputCity.text.toString(), 0.0, 0.0), true
                 )
+            }
+            ?.setNeutralButton("Показать на карте") { _, _ ->
+                if (Geocoder.isPresent()) {
+                    Thread {
+                        Geocoder(context).getFromLocationName(inputCity.text.toString(), 1)
+                            ?.firstOrNull()?.let {
+                            openMapsFragment(it.latitude, it.longitude)
+                        }
+                    }.start()
+                }
             }
             ?.setNegativeButton("Отмена") { dialog, _ -> dialog.cancel() }
         val alertDialog = dialogBuilder?.create()
