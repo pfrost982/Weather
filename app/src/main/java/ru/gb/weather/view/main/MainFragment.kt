@@ -97,7 +97,7 @@ class MainFragment : Fragment() {
             }
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
-                0,
+                1000,
                 0f,
                 locationListener
             )
