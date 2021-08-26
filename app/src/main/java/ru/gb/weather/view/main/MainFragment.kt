@@ -2,14 +2,11 @@ package ru.gb.weather.view.main
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ContentResolver
-import android.content.ContentValues
 import android.content.Context.LOCATION_SERVICE
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,6 +23,7 @@ import ru.gb.weather.databinding.FragmentMainBinding
 import ru.gb.weather.model.City
 import ru.gb.weather.model.Weather
 import ru.gb.weather.view.details.DetailsFragment
+import ru.gb.weather.view.map.MapsFragment
 import ru.gb.weather.viewmodel.AppState
 import ru.gb.weather.viewmodel.MainViewModel
 
@@ -86,8 +84,6 @@ class MainFragment : Fragment() {
         val locationManager = context?.getSystemService(LOCATION_SERVICE) as LocationManager
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             var first = true
-            val provider = locationManager.getProvider(LocationManager.GPS_PROVIDER)
-            Log.d(TAG, "showCoordinates: $provider")
             val locationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
                     Log.d(TAG, "requestLocationUpdates")
@@ -98,19 +94,17 @@ class MainFragment : Fragment() {
                 override fun onProviderDisabled(provider: String) {}
                 override fun onProviderEnabled(provider: String) {}
             }
-
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
-                100,
+                0,
                 0f,
                 locationListener
             )
-
         } else {
             val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            if(location != null){
+            if (location != null) {
                 showCoordinatesAlert(location.latitude, location.longitude)
-            } else{
+            } else {
                 Log.d(TAG, "showCoordinates: null")
             }
         }
@@ -122,7 +116,7 @@ class MainFragment : Fragment() {
                 .setTitle("Координаты: ")
                 .setMessage("Широта: ${lat}\nДолгота: $lon")
                 .setPositiveButton("Открыть карту") { _, _ ->
-                    //todo
+                    openMapsFragment(lat, lon)
                 }
                 .setNegativeButton("Закрыть") { dialog, _ -> dialog.dismiss() }
                 .create()
@@ -209,6 +203,14 @@ class MainFragment : Fragment() {
                 .addToBackStack("")
                 .commitAllowingStateLoss()
         }
+    }
+
+    private fun openMapsFragment(lat: Double, lon: Double) {
+        binding.mainFragmentLoadingLayout.visibility = View.GONE
+        activity?.supportFragmentManager
+            ?.beginTransaction()?.add(R.id.container, MapsFragment(lat, lon))
+            ?.addToBackStack("")
+            ?.commitAllowingStateLoss()
     }
 
     private fun View.showSnackBar(

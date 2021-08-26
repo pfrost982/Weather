@@ -26,13 +26,13 @@ class App : Application() {
                 synchronized(CitiesDataBase::class.java) {
                     if (db == null) {
                         if (appInstance == null) throw IllegalStateException("Application is null while creating DataBase")
-                            db = Room.databaseBuilder(
-                                appInstance!!.applicationContext,
-                                CitiesDataBase::class.java,
-                                "cities-db"
-                            )
-                                .allowMainThreadQueries()
-                                .build()
+                        db = Room.databaseBuilder(
+                            appInstance!!.applicationContext,
+                            CitiesDataBase::class.java,
+                            "cities-db"
+                        )
+                            .allowMainThreadQueries()
+                            .build()
                     }
                 }
             }
