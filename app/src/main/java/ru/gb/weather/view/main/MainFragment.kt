@@ -6,9 +6,12 @@ import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context.LOCATION_SERVICE
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +30,7 @@ import ru.gb.weather.viewmodel.AppState
 import ru.gb.weather.viewmodel.MainViewModel
 
 const val REQUEST_CODE = 404
+const val TAG = "@@@"
 
 class MainFragment : Fragment() {
     companion object {
@@ -62,16 +66,17 @@ class MainFragment : Fragment() {
 
     private fun getLocation() {
         context?.let { context ->
-            when (PackageManager.PERMISSION_GRANTED) {
-                ContextCompat.checkSelfPermission(
+            if (ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_FINE_LOCATION
-                ) -> {
-                    showCoordinates()
-                }
-                else -> {
-                    requestPermission()
-                }
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                showCoordinates()
+            } else {
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    REQUEST_CODE
+                )
             }
         }
     }
@@ -79,11 +84,35 @@ class MainFragment : Fragment() {
     @SuppressLint("MissingPermission")
     private fun showCoordinates() {
         val locationManager = context?.getSystemService(LOCATION_SERVICE) as LocationManager
-        var first = true
-        // сделал как на уроке а эта ерунда циклически вызывается, пришлось извращаться
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f) { location ->
-            if (first) showCoordinatesAlert(location.latitude, location.longitude)
-            first = false
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            var first = true
+            val provider = locationManager.getProvider(LocationManager.GPS_PROVIDER)
+            Log.d(TAG, "showCoordinates: $provider")
+            val locationListener = object : LocationListener {
+                override fun onLocationChanged(location: Location) {
+                    Log.d(TAG, "requestLocationUpdates")
+                    if (first) showCoordinatesAlert(location.latitude, location.longitude)
+                    first = false
+                }
+
+                override fun onProviderDisabled(provider: String) {}
+                override fun onProviderEnabled(provider: String) {}
+            }
+
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                100,
+                0f,
+                locationListener
+            )
+
+        } else {
+            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if(location != null){
+                showCoordinatesAlert(location.latitude, location.longitude)
+            } else{
+                Log.d(TAG, "showCoordinates: null")
+            }
         }
     }
 
@@ -91,25 +120,14 @@ class MainFragment : Fragment() {
         context?.let { context ->
             AlertDialog.Builder(context)
                 .setTitle("Координаты: ")
-                .setMessage("Широта: ${lat}\nДолгота: ${lon}")
-                .setPositiveButton("Передать в контент провайдер") { dialog, _ ->
-                    val contentResolver: ContentResolver = context.contentResolver
-                    val contentValues = ContentValues()
-                    contentValues.put("lat", lat)
-                    contentValues.put("lon", lon)
-                    contentResolver.insert(Uri.parse("content://ru.gb.weather.coordinates"), contentValues)
+                .setMessage("Широта: ${lat}\nДолгота: $lon")
+                .setPositiveButton("Открыть карту") { _, _ ->
+                    //todo
                 }
                 .setNegativeButton("Закрыть") { dialog, _ -> dialog.dismiss() }
                 .create()
                 .show()
         }
-    }
-
-    private fun requestPermission() {
-        requestPermissions(
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_CODE
-        )
     }
 
     override fun onRequestPermissionsResult(
