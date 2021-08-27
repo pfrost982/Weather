@@ -1,15 +1,26 @@
 package ru.gb.weather.model
 
+import retrofit2.Callback
+import ru.gb.weather.App
+import ru.gb.weather.model.web.OpenWeatherWebEntity
+
 class RepositoryImpl : Repository {
-    override fun getWeatherFromServer(): Weather {
-        return Weather()
+    private val serviceOpenWeather = App.getServiceOpenWeather()
+    private var citiesDao = App.getCitiesDao()
+
+    override fun getWeatherFromServer(city: City, callback: Callback<OpenWeatherWebEntity>) {
+        serviceOpenWeather.getCurrentWeather(city.cityName).enqueue(callback)
     }
 
-    override fun getWeatherFromLocalStorageRus(): List<Weather> {
-        return getRussianCities()
+    override fun getCitiesListFromLocalStorage(): List<City> =
+        citiesDao.getAll()
+
+    override fun addCityToLocalStorage(city: City) {
+        citiesDao.deleteCityByName(city.cityName)
+        citiesDao.insertCity(city)
     }
 
-    override fun getWeatherFromLocalStorageWorld(): List<Weather> {
-        return getWorldCities()
+    override fun deleteCityFromLocalStorage(city: City) {
+        citiesDao.deleteCityByName(city.cityName)
     }
 }
