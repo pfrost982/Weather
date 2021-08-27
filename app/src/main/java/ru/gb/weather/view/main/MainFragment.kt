@@ -44,6 +44,7 @@ class MainFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
     private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it) }
+    private var locationListener: LocationListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,12 +85,11 @@ class MainFragment : Fragment() {
     private fun showCoordinates() {
         val locationManager = context?.getSystemService(LOCATION_SERVICE) as LocationManager
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            var first = true
-            val locationListener = object : LocationListener {
+            locationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
                     Log.d(TAG, "requestLocationUpdates")
-                    if (first) showCoordinatesAlert(location.latitude, location.longitude)
-                    first = false
+                    locationListener?.let { locationManager.removeUpdates(it) }
+                    showCoordinatesAlert(location.latitude, location.longitude)
                 }
 
                 override fun onProviderDisabled(provider: String) {}
@@ -99,7 +99,7 @@ class MainFragment : Fragment() {
                 LocationManager.GPS_PROVIDER,
                 1000,
                 0f,
-                locationListener
+                locationListener as LocationListener
             )
         } else {
             val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
@@ -168,8 +168,8 @@ class MainFragment : Fragment() {
                     Thread {
                         Geocoder(context).getFromLocationName(inputCity.text.toString(), 1)
                             ?.firstOrNull()?.let {
-                            openMapsFragment(it.latitude, it.longitude)
-                        }
+                                openMapsFragment(it.latitude, it.longitude)
+                            }
                     }.start()
                 }
             }
