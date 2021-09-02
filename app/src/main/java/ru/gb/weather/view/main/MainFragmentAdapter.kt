@@ -6,43 +6,37 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.gb.weather.R
-import ru.gb.weather.model.Weather
+import ru.gb.weather.model.City
 
 class MainFragmentAdapter(private var onItemViewClickListener: MainFragment.OnItemViewClickListener?) :
     RecyclerView.Adapter<MainFragmentAdapter.MainViewHolder>() {
 
-    private var weatherData: List<Weather> = listOf()
+    private var weatherData: List<City> = listOf()
 
-    fun setWeather(data: List<Weather>) {
+    fun setWeather(data: List<City>) {
         weatherData = data
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): MainViewHolder {
-        return MainViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder =
+        MainViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.fragment_main_recycler_item, parent, false) as View
         )
-    }
 
-    override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MainViewHolder, position: Int) =
         holder.bind(weatherData[position])
-    }
 
-    override fun getItemCount(): Int {
-        return weatherData.size
-    }
+    override fun getItemCount(): Int = weatherData.size
 
     inner class MainViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(weather: Weather) {
-            itemView.findViewById<TextView>(R.id.mainFragmentRecyclerItemTextView).text =
-                weather.city.city
-            itemView.setOnClickListener { onItemViewClickListener?.onItemViewClick(weather) }
+        fun bind(city: City) {
+            itemView.apply {
+                findViewById<TextView>(R.id.mainFragmentRecyclerItemTextView).text =
+                    city.cityName
+                setOnClickListener { onItemViewClickListener?.onItemViewClick(city) }
+            }
         }
-
     }
 
     fun removeListener() {
