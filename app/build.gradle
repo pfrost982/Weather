@@ -25,13 +25,6 @@ android {
         viewBinding true
     }
 
-    buildTypes.each {
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file("apikey.properties").newDataInputStream())
-        def apiKey = properties.getProperty("api_openweathermap_org_key", "")
-        it.buildConfigField "String", "WEATHER_API_KEY", apiKey
-    }
-
     buildTypes {
         release {
             minifyEnabled false
