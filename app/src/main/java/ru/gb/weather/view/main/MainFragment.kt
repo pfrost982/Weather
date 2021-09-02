@@ -205,10 +205,7 @@ class MainFragment : Fragment() {
         activity?.supportFragmentManager?.apply {
             beginTransaction().add(
                 R.id.container,
-                DetailsFragment.newInstance(viewModel, Bundle().apply {
-                    putParcelable(DetailsFragment.EXTRA_WEATHER, weather)
-                    putBoolean(DetailsFragment.EXTRA_NEW_CITY, newCity)
-                })
+                DetailsFragment(viewModel, weather, newCity)
             )
                 .addToBackStack("")
                 .commitAllowingStateLoss()
