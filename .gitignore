@@ -1,12 +1,14 @@
 *.iml
 .gradle
 /local.properties
+/apikey.properties
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+apikey.properties
 /.idea/
 /app/src/androidTest/
 /app/src/test/

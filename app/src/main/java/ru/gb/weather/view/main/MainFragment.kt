@@ -26,15 +26,7 @@ class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
-    private val adapter = MainFragmentAdapter { weather ->
-        activity?.supportFragmentManager?.apply {
-            beginTransaction().add(R.id.container, DetailsFragment.newInstance(Bundle().apply {
-                putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
-            }))
-                .addToBackStack("")
-                .commitAllowingStateLoss()
-        }
-    }
+    private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it.city) }
 
     private var isDataSetRus: Boolean = true
 
@@ -58,13 +50,13 @@ class MainFragment : Fragment() {
     private fun changeWeatherDataSet() = when {
         isDataSetRus -> {
             viewModel.getWeatherFromLocalSourceWorld()
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_earth)
+            binding.mainFragmentFAB.setImageResource(R.drawable.russia_b)
             binding.imageView.setImageResource(R.drawable.world)
             binding.imageView.alpha = 0.4F
         }
         else -> {
             viewModel.getWeatherFromLocalSourceRus()
-            binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
+            binding.mainFragmentFAB.setImageResource(R.drawable.world_b)
             binding.imageView.setImageResource(R.drawable.home)
             binding.imageView.alpha = 0.85F
         }
@@ -72,11 +64,24 @@ class MainFragment : Fragment() {
         isDataSetRus = !isDataSetRus
     }
 
-    private fun renderData(appState: AppState) =
+    private fun renderData(appState: AppState): Any? =
         when (appState) {
-            is AppState.Success -> {
+            is AppState.SuccessList -> {
                 binding.mainFragmentLoadingLayout.visibility = View.GONE
-                adapter.setWeather(appState.weatherData)
+                adapter.setWeather(appState.weatherDataList)
+            }
+            is AppState.SuccessWeather -> {
+                binding.mainFragmentLoadingLayout.visibility = View.GONE
+                activity?.supportFragmentManager?.apply {
+                    beginTransaction().add(
+                        R.id.container,
+                        DetailsFragment.newInstance(Bundle().apply {
+                            putParcelable(DetailsFragment.BUNDLE_EXTRA, appState.weatherData)
+                        })
+                    )
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
             }
             is AppState.Loading -> {
                 binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
