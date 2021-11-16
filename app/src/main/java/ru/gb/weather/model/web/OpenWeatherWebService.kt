@@ -1,4 +1,4 @@
-package ru.gb.weather.model
+package ru.gb.weather.model.web
 
 import retrofit2.Call
 import retrofit2.http.GET

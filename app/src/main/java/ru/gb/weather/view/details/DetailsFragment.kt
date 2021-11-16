@@ -9,13 +9,16 @@ import com.bumptech.glide.Glide
 import ru.gb.weather.R
 import ru.gb.weather.databinding.FragmentDetailsBinding
 import ru.gb.weather.model.Weather
+import ru.gb.weather.viewmodel.MainViewModel
 
-class DetailsFragment : Fragment() {
+class DetailsFragment(private val viewModel: MainViewModel) : Fragment() {
     companion object {
-        const val BUNDLE_EXTRA = "weather"
-
-        fun newInstance(bundle: Bundle): DetailsFragment = DetailsFragment().apply {
-            this.arguments = bundle
+        const val EXTRA_WEATHER = "EXTRA_WEATHER"
+        const val EXTRA_NEW_CITY = "EXTRA_CITY"
+        fun newInstance(viewModel: MainViewModel, bundle: Bundle): DetailsFragment {
+            return DetailsFragment(viewModel).apply {
+                this.arguments = bundle
+            }
         }
     }
 
@@ -31,7 +34,12 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.getParcelable<Weather>(BUNDLE_EXTRA)?.let { weather ->
+        var newCity = arguments?.getBoolean(EXTRA_NEW_CITY)
+        if (newCity == false) {
+            binding.detailsFragmentFab.setImageResource(R.drawable.ic_baseline_location_off_24)
+        }
+
+        arguments?.getParcelable<Weather>(EXTRA_WEATHER)?.let { weather ->
             weather.city.also { city ->
                 binding.cityName.text = city.cityName
                 binding.cityCoordinates.text = String.format(
@@ -39,13 +47,25 @@ class DetailsFragment : Fragment() {
                     city.lat.toString(),
                     city.lon.toString()
                 )
-                binding.temperatureValue.text = weather.temperature.toString()
-                binding.feelsLikeValue.text = weather.feelsLike.toString()
-                binding.description.text = weather.description
-                Glide.with(this)
-                    .load("https://openweathermap.org/img/wn/${weather.icon}@4x.png")
-                    .centerCrop()
-                    .into(binding.imageView)
+            }
+            binding.temperatureValue.text = weather.temperature.toString()
+            binding.feelsLikeValue.text = weather.feelsLike.toString()
+            binding.description.text = weather.description
+            Glide.with(this)
+                .load("https://openweathermap.org/img/wn/${weather.icon}@4x.png")
+                .centerCrop()
+                .into(binding.imageView)
+
+            binding.detailsFragmentFab.setOnClickListener {
+                newCity = if (newCity == false) {
+                    viewModel.deleteCity(weather.city)
+                    binding.detailsFragmentFab.setImageResource(R.drawable.ic_baseline_add_24)
+                    true
+                } else {
+                    viewModel.addCity(weather.city)
+                    binding.detailsFragmentFab.setImageResource(R.drawable.ic_baseline_location_off_24)
+                    false
+                }
             }
         }
     }
@@ -55,3 +75,4 @@ class DetailsFragment : Fragment() {
         super.onDestroyView()
     }
 }
+

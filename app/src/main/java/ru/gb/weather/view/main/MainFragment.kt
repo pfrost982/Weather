@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.gb.weather.R
 import ru.gb.weather.databinding.FragmentMainBinding
+import ru.gb.weather.model.City
 import ru.gb.weather.model.Weather
 import ru.gb.weather.view.details.DetailsFragment
 import ru.gb.weather.viewmodel.AppState
@@ -20,15 +23,13 @@ class MainFragment : Fragment() {
     }
 
     fun interface OnItemViewClickListener {
-        fun onItemViewClick(weather: Weather)
+        fun onItemViewClick(city: City)
     }
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by lazy { ViewModelProvider(this).get(MainViewModel::class.java) }
-    private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it.city) }
-
-    private var isDataSetRus: Boolean = true
+    private val adapter = MainFragmentAdapter { viewModel.getWeatherFromRemoteSource(it) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,41 +43,37 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.mainFragmentRecyclerView.adapter = adapter
-        binding.mainFragmentFab.setOnClickListener { changeWeatherDataSet() }
+        binding.mainFragmentFab.setOnClickListener { showDialogView() }
         viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
-        setRusData()
+        viewModel.getCitiesListFromLocalSource()
     }
 
-    private fun changeWeatherDataSet() {
-        isDataSetRus = !isDataSetRus
-        when {
-            isDataSetRus -> setRusData()
-            else -> setWorldData()
-        }
-    }
-
-    private fun setWorldData() {
-        viewModel.getWeatherFromLocalSourceWorld()
-        binding.mainFragmentFab.setImageResource(R.drawable.russia_b)
-        binding.imageView.setImageResource(R.drawable.world)
-        binding.imageView.alpha = 0.4F
-    }
-
-    private fun setRusData() {
-        viewModel.getWeatherFromLocalSourceRus()
-        binding.mainFragmentFab.setImageResource(R.drawable.world_b)
-        binding.imageView.setImageResource(R.drawable.home)
-        binding.imageView.alpha = 0.85F
+    private fun showDialogView() {
+        val dialogView: View = layoutInflater.inflate(R.layout.dialog_new_city, null)
+        val dialogBuilder = context?.let { AlertDialog.Builder(it) }
+        dialogBuilder?.setView(dialogView)
+        val inputCity: EditText = dialogView.findViewById(R.id.dialog_input_text)
+        dialogBuilder
+            ?.setCancelable(false)
+            ?.setPositiveButton("OK") { _, _ ->
+                viewModel.getWeatherFromRemoteSource(
+                    City(0, inputCity.text.toString(), 0.0, 0.0),
+                    true
+                )
+            }
+            ?.setNegativeButton("Отмена") { dialog, _ -> dialog.cancel() }
+        val alertDialog = dialogBuilder?.create()
+        alertDialog?.show()
     }
 
     private fun renderData(appState: AppState) =
         when (appState) {
             is AppState.SuccessList -> {
                 binding.mainFragmentLoadingLayout.visibility = View.GONE
-                adapter.setWeather(appState.weatherDataList)
+                adapter.setWeather(appState.citiesDataList)
             }
             is AppState.SuccessWeather -> {
-                openDetailsFragment(appState.weatherData)
+                openDetailsFragment(appState.weatherData, appState.newCity)
             }
             is AppState.Loading -> {
                 binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
@@ -86,21 +83,19 @@ class MainFragment : Fragment() {
                 binding.mainFragmentRootView.showSnackBar(
                     appState.error.toString(),
                     getString(R.string.reload), {
-                        when {
-                            isDataSetRus -> setRusData()
-                            else -> setWorldData()
-                        }
+                        viewModel.getCitiesListFromLocalSource()
                     })
             }
         }
 
-    private fun openDetailsFragment(weather: Weather) {
+    private fun openDetailsFragment(weather: Weather, newCity: Boolean = false) {
         binding.mainFragmentLoadingLayout.visibility = View.GONE
         activity?.supportFragmentManager?.apply {
             beginTransaction().add(
                 R.id.container,
-                DetailsFragment.newInstance(Bundle().apply {
-                    putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
+                DetailsFragment.newInstance(viewModel, Bundle().apply {
+                    putParcelable(DetailsFragment.EXTRA_WEATHER, weather)
+                    putBoolean(DetailsFragment.EXTRA_NEW_CITY, newCity)
                 })
             )
                 .addToBackStack("")
@@ -114,7 +109,6 @@ class MainFragment : Fragment() {
         action: (View) -> Unit,
         length: Int = Snackbar.LENGTH_INDEFINITE
     ) = Snackbar.make(this, text, length).setAction(actionText, action).show()
-
 
     override fun onDestroyView() {
         _binding = null
