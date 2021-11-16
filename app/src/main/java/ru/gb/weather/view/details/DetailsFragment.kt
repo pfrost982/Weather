@@ -32,7 +32,7 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         arguments?.getParcelable<Weather>(BUNDLE_EXTRA)?.let { weather ->
             weather.city.also { city ->
-                binding.cityName.text = city.city
+                binding.cityName.text = city.cityName
                 binding.cityCoordinates.text = String.format(
                     getString(R.string.city_coordinates),
                     city.lat.toString(),
